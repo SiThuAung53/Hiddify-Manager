@@ -11,8 +11,15 @@ cd ..
 
 
 pip install hiddifypanel==$(get_release_version hiddify-panel)
-curl -L -s -o hiddify-manager.zip https://github.com/SiThuAung53/Hiddify-Manager/releases/latest/download/hiddify-manager.zip
-unzip -o hiddify-manager.zip
-rm hiddify-manager.zip
-ln -s /opt/hiddify-manager /opt/hiddify-config
+cd /opt/hiddify-manager
+if [ -d ".git" ]; then
+    git remote set-url origin https://github.com/SiThuAung53/Hiddify-Manager.git 2>/dev/null || true
+    git fetch origin && git reset --hard origin/main
+else
+    tmp_dir=$(mktemp -d)
+    git clone --branch main --depth 1 https://github.com/SiThuAung53/Hiddify-Manager.git "$tmp_dir"
+    cp -a "$tmp_dir"/. /opt/hiddify-manager/
+    rm -rf "$tmp_dir"
+fi
+ln -sf /opt/hiddify-manager /opt/hiddify-config
 bash install.sh
