@@ -186,7 +186,8 @@ function update_config() {
     local package_mode=$1
     local force=$2
     local current_config_version=$(get_installed_config_version)
-    
+    local branch="main"
+
     case "$package_mode" in
         docker)
             echo "installing in docker mode"
@@ -194,53 +195,40 @@ function update_config() {
             echo "installing in docker mode finishs"
         ;;
         v*)
-            update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
+            branch="main"
+            update_progress "Updating..." "Hiddify Config from $current_config_version to ${package_mode}" 60
             export HIDDIFY_DISABLE_UPDATE=true
-            #update_from_github "hiddify-manager.tar.gz" "https://github.com/SiThuAung53/Hiddify-Manager/archive/refs/tags/${package_mode}.tar.gz" $latest
-            update_from_github "hiddify-manager.zip" "https://github.com/SiThuAung53/Hiddify-Manager/releases/download/${package_mode}/hiddify-manager.zip" $latest
-            update_progress "Updated..." "Hiddify Config to $latest" 100
+            clone_from_github "$branch" "${package_mode}"
+            update_progress "Updated..." "Hiddify Config to ${package_mode}" 100
             return 0
         ;;
         develop|dev)
-            local latest=$(get_commit_version hiddify-manager)
-            echo "DEVELOP: Current Config Version=$current_config_version -- Latest=$latest"
-            if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
-                update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.tar.gz" "https://github.com/SiThuAung53/Hiddify-Manager/archive/refs/heads/dev.tar.gz" $latest
-                
-                update_progress "Updated..." "Hiddify Config to $latest" 100
-                return 0
-            fi
+            branch="dev"
+            update_progress "Updating..." "Hiddify Config (dev)" 60
+            clone_from_github "$branch"
+            update_progress "Updated..." "Hiddify Config (dev)" 100
+            return 0
         ;;
         beta)
-            local latest=$(get_pre_release_version hiddify-manager)
-            echo "BETA: Current Config Version=$current_config_version -- Latest=$latest"
-            if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
-                update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.zip" "https://github.com/SiThuAung53/Hiddify-Manager/releases/download/v$latest/hiddify-manager.zip"
-                update_progress "Updated..." "Hiddify Config to $latest" 100
-                return 0
-            fi
+            branch="beta"
+            update_progress "Updating..." "Hiddify Config (beta)" 60
+            clone_from_github "$branch"
+            update_progress "Updated..." "Hiddify Config (beta)" 100
+            return 0
         ;;
         release)
-            # error "you can not install release version 8 using this script"
-            # exit 1
-            local latest=$(get_release_version hiddify-manager)
-            echo "RELEASE: Current Config Version=$current_config_version -- Latest=$latest"
-            if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
-                update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.zip" "https://github.com/SiThuAung53/Hiddify-Manager/releases/latest/download/hiddify-manager.zip"
-                update_progress "Updated..." "Hiddify Config to $latest" 100
-                return 0
-            fi
-            
+            branch="main"
+            update_progress "Updating..." "Hiddify Config (release)" 60
+            clone_from_github "$branch"
+            update_progress "Updated..." "Hiddify Config (release)" 100
+            return 0
         ;;
         *)
             echo "Unknown package mode: $package_mode"
             exit 1
         ;;
     esac
-    
+
     return 1
 }
 
@@ -277,6 +265,44 @@ function post_update_tasks() {
           ;;
       esac
     fi
+}
+
+function clone_from_github() {
+    local branch=${1:-main}
+    local override_version=$2
+    local repo_url="https://github.com/SiThuAung53/Hiddify-Manager.git"
+
+    install_package git
+    mkdir -p /opt/hiddify-manager
+
+    if [ -d "/opt/hiddify-manager/.git" ]; then
+        cd /opt/hiddify-manager
+        git remote set-url origin "$repo_url" 2>/dev/null || true
+        git fetch origin
+        git checkout "$branch" 2>/dev/null || git checkout -b "$branch" "origin/$branch"
+        git reset --hard "origin/$branch"
+    else
+        local tmp_dir=$(mktemp -d)
+        git clone --branch "$branch" --depth 1 "$repo_url" "$tmp_dir"
+        cp -a "$tmp_dir"/. /opt/hiddify-manager/
+        rm -rf "$tmp_dir"
+    fi
+
+    cd /opt/hiddify-manager
+    if [[ ! -z "$override_version" ]]; then
+        echo "$override_version" >VERSION
+    fi
+    rm -f xray/configs/*.json
+    rm -f singbox/configs/*.json
+    rm -f /opt/hiddify-manager/xray/configs/05_inbounds_10*.json*
+    rm -f /opt/hiddify-manager/xray/configs/05_inbounds_h2*.json*
+    rm -f /opt/hiddify-manager/xray/configs/05_inbounds_02_realitygrpc*.json*
+    rm -f /opt/hiddify-manager/xray/configs/05_inbounds_02_realityh2*.json*
+    rm -f /opt/hiddify-manager/singbox/configs/05_inbounds_2071_realitygrpc_main.json*
+    rm -f /opt/hiddify-manager/singbox/configs/05_inbounds_20[123][1234]*.json*
+
+    bash install.sh --no-gui --no-log
+    bash install.sh --no-gui --no-log #temporary fix
 }
 
 function update_from_github() {
