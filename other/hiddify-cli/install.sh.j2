@@ -3,10 +3,10 @@ source ../../common/utils.sh
 
 useradd -m hiddify-cli -s /bin/bash >/dev/null 2>&1
 
-latest=$(get_release_version hiddify-core)
+latest="3.2.0"
 
 if [ "$(cat 'VERSION' 2>/dev/null)" != "$latest" ] || ! is_installed ./HiddifyCli; then
-    echo "Downloading HiddifyCli..."
+    echo "Downloading HiddifyCli v$latest..."
     pkg=$(dpkg --print-architecture)
 
     curl -sLo hiddify-cli.tar.gz https://github.com/hiddify/hiddify-core/releases/download/v$latest/hiddify-cli-linux-$pkg.tar.gz
