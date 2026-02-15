@@ -25,5 +25,10 @@ rm /etc/nginx/conf.d/xray-base.conf >/dev/null 2>&1
 rm /etc/nginx/conf.d/speedtest.conf >/dev/null 2>&1
 
 mkdir -p run
+mkdir -p parts
+
+# Ensure short-link.conf exists for nginx to start
+touch parts/short-link.conf
+
 ln -sf $(pwd)/hiddify-nginx.service /etc/systemd/system/hiddify-nginx.service
 systemctl enable hiddify-nginx.service
