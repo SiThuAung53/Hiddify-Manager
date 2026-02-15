@@ -5,6 +5,11 @@ echo -n "" >> ../log/system/panel.log
 chown hiddify-panel ../log/system/panel.log
 
 chown -R hiddify-panel:hiddify-panel . >/dev/null 2>&1
+
+# Ensure parent directory and venv are accessible to hiddify-panel user
+chmod o+rx /opt/hiddify-manager/ >/dev/null 2>&1
+chmod -R o+rX /opt/hiddify-manager/.venv313/ >/dev/null 2>&1
+
 chmod 600 app.cfg
 
 
