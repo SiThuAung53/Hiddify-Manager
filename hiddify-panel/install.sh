@@ -13,6 +13,11 @@ chown -R hiddify-panel:hiddify-panel /home/hiddify-panel/ >/dev/null 2>&1
 localectl set-locale LANG=C.UTF-8 >/dev/null 2>&1
 su hiddify-panel -c update-locale LANG=C.UTF-8 >/dev/null 2>&1
 chown -R hiddify-panel:hiddify-panel . >/dev/null 2>&1
+
+# Ensure parent directory and venv are accessible to hiddify-panel user
+chmod o+rx /opt/hiddify-manager/ >/dev/null 2>&1
+chmod -R o+rX /opt/hiddify-manager/.venv313/ >/dev/null 2>&1
+
 # activate venv for hiddify-panel user
 if ! grep -Fxq "source /opt/hiddify-manager/.venv313/bin/activate" "/home/hiddify-panel/.bashrc" && ! grep -Fxq "export PATH=/opt/hiddify-manager/.venv313/bin:\$PATH" "/home/hiddify-panel/.bashrc"; then
     echo "source /opt/hiddify-manager/.venv313/bin/activate" >> "/home/hiddify-panel/.bashrc"
