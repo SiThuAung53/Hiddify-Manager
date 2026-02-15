@@ -47,8 +47,8 @@ export DEBIAN_FRONTEND=noninteractive
 export USE_VENV=true
 
 echo "we are going to download needed files:)"
-GITHUB_REPOSITORY=hiddify-config
-GITHUB_USER=hiddify
+GITHUB_REPOSITORY=Hiddify-Manager
+GITHUB_USER=SiThuAung53
 GITHUB_BRANCH_OR_TAG=main
 
 # if [ ! -d "/opt/$GITHUB_REPOSITORY" ];then
@@ -59,12 +59,12 @@ apt update
 apt install -y curl unzip
 mkdir -p /opt/$GITHUB_REPOSITORY
 cd /opt/$GITHUB_REPOSITORY
-curl -L -s -o $GITHUB_REPOSITORY.zip https://github.com/hiddify/$GITHUB_REPOSITORY/releases/download/v10.5.73/$GITHUB_REPOSITORY.zip
+curl -L -s -o $GITHUB_REPOSITORY.zip https://github.com/$GITHUB_USER/$GITHUB_REPOSITORY/releases/download/v10.5.73/$GITHUB_REPOSITORY.zip
 unzip -o $GITHUB_REPOSITORY.zip > /dev/null
 rm $GITHUB_REPOSITORY.zip
 rm -f xray/configs/*.json
 rm -f singbox/configs/*.json
-source /opt/hiddify-config/common/utils.sh
+source /opt/$GITHUB_REPOSITORY/common/utils.sh
 install_python
 install_pypi_package pip==24.0
 pip install -U hiddifypanel==8.8.99

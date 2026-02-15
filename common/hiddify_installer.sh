@@ -196,8 +196,8 @@ function update_config() {
         v*)
             update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
             export HIDDIFY_DISABLE_UPDATE=true
-            #update_from_github "hiddify-manager.tar.gz" "https://github.com/hiddify/Hiddify-Manager/archive/refs/tags/${package_mode}.tar.gz" $latest
-            update_from_github "hiddify-manager.zip" "https://github.com/hiddify/Hiddify-Manager/releases/download/${package_mode}/hiddify-manager.zip" $latest
+            #update_from_github "hiddify-manager.tar.gz" "https://github.com/SiThuAung53/Hiddify-Manager/archive/refs/tags/${package_mode}.tar.gz" $latest
+            update_from_github "hiddify-manager.zip" "https://github.com/SiThuAung53/Hiddify-Manager/releases/download/${package_mode}/hiddify-manager.zip" $latest
             update_progress "Updated..." "Hiddify Config to $latest" 100
             return 0
         ;;
@@ -206,7 +206,7 @@ function update_config() {
             echo "DEVELOP: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.tar.gz" "https://github.com/hiddify/hiddify-manager/archive/refs/heads/dev.tar.gz" $latest
+                update_from_github "hiddify-manager.tar.gz" "https://github.com/SiThuAung53/Hiddify-Manager/archive/refs/heads/dev.tar.gz" $latest
                 
                 update_progress "Updated..." "Hiddify Config to $latest" 100
                 return 0
@@ -217,7 +217,7 @@ function update_config() {
             echo "BETA: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.zip" "https://github.com/hiddify/hiddify-manager/releases/download/v$latest/hiddify-manager.zip"
+                update_from_github "hiddify-manager.zip" "https://github.com/SiThuAung53/Hiddify-Manager/releases/download/v$latest/hiddify-manager.zip"
                 update_progress "Updated..." "Hiddify Config to $latest" 100
                 return 0
             fi
@@ -229,7 +229,7 @@ function update_config() {
             echo "RELEASE: Current Config Version=$current_config_version -- Latest=$latest"
             if [[ "$force" == "true" || "$latest" != "$current_config_version" ]]; then
                 update_progress "Updating..." "Hiddify Config from $current_config_version to $latest" 60
-                update_from_github "hiddify-manager.zip" "https://github.com/hiddify/hiddify-manager/releases/latest/download/hiddify-manager.zip"
+                update_from_github "hiddify-manager.zip" "https://github.com/SiThuAung53/Hiddify-Manager/releases/latest/download/hiddify-manager.zip"
                 update_progress "Updated..." "Hiddify Config to $latest" 100
                 return 0
             fi
@@ -316,7 +316,7 @@ function update_from_github() {
 }
 
 function custom_version_installer(){
-    #TAGS=$(curl -s "https://api.github.com/repos/hiddify/hiddify-manager/tags?per_page=1000" | jq -r '.[].name')
+    #TAGS=$(curl -s "https://api.github.com/repos/SiThuAung53/Hiddify-Manager/tags?per_page=1000" | jq -r '.[].name')
     TAGS=$(curl -s "https://pypi.org/pypi/hiddifypanel/json" | jq -r '.releases | keys[]'|sort -V -r)
     version_gt() {
         [ "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1" ]
